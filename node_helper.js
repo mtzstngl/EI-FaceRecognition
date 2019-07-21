@@ -1,6 +1,15 @@
 var NodeHelper = require("node_helper");
 const {PythonShell} = require("python-shell");
 
+/**
+ * Ruft mittels PythonShell FaceRecognition.py auf, was die Gesichtserkennung durchführt.
+ * Die Ergebnisse der Gesichtserkennung, werden mittels JSON ausgetauscht.
+ * JSON Object:
+ * {
+ *     "name":  None,
+ *     "emotion": None
+ * }
+ */
 module.exports = NodeHelper.create({
 
 	// System is ready to boot

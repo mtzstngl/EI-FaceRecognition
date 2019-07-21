@@ -1,5 +1,9 @@
 "use strict";
 
+/**
+ * Zeigt den Namen einer Person an, die mittels Gesichtserkennung erkannt wurde.
+ * Es wird auch ein Text angezeigt, je nach Emotion.
+ */
 Module.register("EI-FaceRecognition", {
 
 	// Default module config.
