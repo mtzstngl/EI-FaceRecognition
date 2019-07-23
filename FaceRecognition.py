@@ -8,7 +8,8 @@ import random
 # Python dict object
 status = {
     "name":  None,
-    "emotion": None
+    "emotion": None,
+    "index": -1 # The index of the Person
 }
 
 name = [None, "Peter", "Max"]

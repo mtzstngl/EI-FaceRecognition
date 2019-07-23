@@ -18,7 +18,8 @@ Module.register("EI-FaceRecognition", {
 
 	status: {
 		name: null,
-		emotion: null
+		emotion: null,
+		index: -1 // -1 == Unkown, Every other is a known person
 	},
 
 	start: function() {
@@ -64,6 +65,9 @@ Module.register("EI-FaceRecognition", {
 		case "STATUS": // Got new output from the python module about the current hand position.
 			self.status = payload;
 			self.updateDom();
+			if (!self.hidden) {
+				self.sendNotification("CHANGE_USER", self.status.index);
+			}
 			break;
 		}
 	},
