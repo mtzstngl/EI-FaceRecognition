@@ -30,6 +30,12 @@ Module.register("EI-FaceRecognition", {
 		self.sendSocketNotification("START");
 	},
 
+	// Send current user when we are at the startpage
+	resume: function() {
+		const self = this;
+		self.sendNotification("CHANGE_USER", self.status.index);
+	},
+
 	// Override dom generator.
 	getDom: function() {
 		const self = this;
