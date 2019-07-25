@@ -18,10 +18,13 @@ module.exports = NodeHelper.create({
 
 		let options = {
 			mode: "json",
+			//pythonPath: "/home/smartmirror/MagicMirror/modules/EI-FaceRecognition/Gesichtserkennung/venv/bin/python3", // production version
+			//scriptPath: "modules/EI-FaceRecognition/Gesichtserkennung", // production version
 			scriptPath: "modules/EI-FaceRecognition",
 			pythonOptions: ["-u"] // This is needed otherwise we don't receive the output until the process has ended
 		};
 
+		//const shell = new PythonShell("Gesichtserkennung.py", options); // production version
 		const shell = new PythonShell("FaceRecognition.py", options);
 
 		// Received output from python script; send it to the main module.

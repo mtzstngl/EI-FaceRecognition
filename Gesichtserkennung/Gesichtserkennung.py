@@ -33,7 +33,12 @@ send_away = {
     "emotion": None
 }
 
-zykluszeit = 40
+#Fehlermeldungen
+Error_USB = ""
+Error_Kamera = ""
+
+#Zyklus
+zykluszeit = 30
 zyklus = 1
 
 
@@ -49,21 +54,42 @@ wahrscheinlichste_emotion = ""
 array_emotionen = []
 anzahl_index_emotion = []
 
+sys.stderr = sys.__stderr__
+while True:
+    if os.path.ismount("/media/smartmirror/UNTITLED/"):
+        break
+    else:
+        Error_USB = "Der USB-Stick ist nicht angeschlossen! Stecken Sie den USB-Stick erneut an und aus!"
+        print(json.dumps(Error_USB), file=sys.stderr)
+
+    time.sleep(15)
 
 USB_path = "/media/smartmirror/UNTITLED/"  # Pfad anpassen /media/Benutzer/USB_Name/Datei
 
-video_capture = cv2.VideoCapture(6)
+while True:
+    video_capture = cv2.VideoCapture(6)
+
+    if(not(video_capture.isOpened())):
+        Error_Kamera = "Die Kamera ist nicht angeschlossen! Stecken Sie die Kamera erneut an und aus!"
+        print(json.dumps(Error_Kamera), file=sys.stderr)
+    else:
+        #print("Kamera ist angeschlossen!", file=sys.stderr)
+        break
+
+    time.sleep(15)
+
+sys.stderr = open(os.devnull, 'w')
 
 # Emotion Detection
 # parameters for loading data and images
-emotion_model_path = '/home/smartmirror/Schreibtisch/Gesichtserkenung/venv/models/emotion_model.hdf5'
+emotion_model_path = '/home/smartmirror/MagicMirror/modules/EI-FaceRecognition/Gesichtserkennung/venv/models/emotion_model.hdf5'
 emotion_labels = get_labels('fer2013')
 # hyper-parameters for bounding boxes shape
 frame_window = 10
 emotion_offsets = (20, 40)
 # loading models
 face_cascade = cv2.CascadeClassifier(
-    '/home/smartmirror/Schreibtisch/Gesichtserkenung/venv/models/haarcascade_frontalface_default.xml')
+    '/home/smartmirror/MagicMirror/modules/EI-FaceRecognition/Gesichtserkennung/venv/models/haarcascade_frontalface_default.xml')
 emotion_classifier = load_model(emotion_model_path)
 # getting input model shapes for inference
 emotion_target_size = emotion_classifier.input_shape[1:3]
@@ -96,8 +122,6 @@ process_this_frame = True
 
 sys.stdout = sys.__stdout__
 while True:
-    print(zyklus)
-
     # Grab a single frame of video
     ret, frame = video_capture.read()
     # Resize frame of video to 1/4 size for faster face recognition processing
@@ -168,18 +192,18 @@ while True:
 
 
     if(zykluszeit == zyklus):
-        for i in range(0, anzahl_namen):                    #vorbelegen des Index Arrays Namen mit 0
+        for i in range(0, anzahl_namen):                        #vorbelegen des Index Arrays Namen mit 0
             anzahl_index_name.append(0)
 
-        for i in range(0, 6):                              #vorbelegen des Index Arrays Emotion mit 0
+        for i in range(0, 6):                                   #vorbelegen des Index Arrays Emotion mit 0
             anzahl_index_emotion.append(0)
 
-        for i in range(0, anzahl_namen):                    #ermitteln wie oft ein Name vorkommt
+        for i in range(0, anzahl_namen):                        #ermitteln wie oft ein Name vorkommt
             for j in range(0, len(array_names)):
                 if(array_names[j]==known_face_names[i]):
                     anzahl_index_name[i]=anzahl_index_name[i]+1
 
-        for i in range(0, len(anzahl_index_name)):               #ermitteln des Namen der am häufigsten vorkam
+        for i in range(0, len(anzahl_index_name)):              #ermitteln des Namen der am häufigsten vorkam
             if(anzahl_index_name[i] == 0):
                 wahrscheinlichster_name='Unknown.jpg'
             else:
@@ -187,16 +211,16 @@ while True:
                 break
 
 
-        Keine_Person=0
-        for i in range(0, len(array_names)):
-            if(array_names[i] == ""):
+        Keine_Person=0                                      #Wenn keine Person davor steht dann ist an jeder array_name
+        for i in range(0, len(array_names)):                #Position ein leerer string
+            if(array_names[i] == ""):                       #dann soll wahrscheinlichster_name auch ein leerer string sein
                 Keine_Person=Keine_Person+1
 
         if(Keine_Person == zykluszeit):
             wahrscheinlichster_name = ""
 
 
-        for i in range(0, len(array_emotionen)):
+        for i in range(0, len(array_emotionen)):                           #mittelung der emotion
             if(array_emotionen[i]=="happy"):
                 anzahl_index_emotion[0]=anzahl_index_emotion[0]+1
             elif(array_emotionen[i] == "sad"):
@@ -223,21 +247,15 @@ while True:
         elif(np.argmax(anzahl_index_emotion) == 5):
             wahrscheinlichste_emotion = "neutral"
 
-        #print("Anzahl Index: ", end="")
-        #print(anzahl_index_emotion)
-        #print("Array Names: ", end="")
-        #print(array_names)
-        #print("Emotion: ", end="")
-        #print(wahrscheinlichste_emotion)
 
 
         if(old_name != wahrscheinlichster_name):                            #nur rausschreiben wenn eine andere Person dort steht
         # Json File zum rausschicken
-            if (wahrscheinlichster_name == 'Unknown.jpg'):
+            if (wahrscheinlichster_name == 'Unknown.jpg'):                  #Wenn unbekannte Person davor steht
                 name_Json = None
                 index_Json = -1
                 emotion_Json = wahrscheinlichste_emotion
-            else:
+            else:                                                           #Wenn bekannte Person davor steht
                 name_Json = wahrscheinlichster_name[:-4]
                 emotion_Json = wahrscheinlichste_emotion
                 index_Json = np.argmax(anzahl_index_name)
@@ -246,19 +264,20 @@ while True:
             # print(name_Json)
             # print(emotion_Json)
             # emotion: angry, sad, neutral, happy, surprise, fear
-            if (name_Json == ''):
+            if (name_Json == ''):                                           #Falls keine Person davor steht
                 name_Json = None
                 emotion_Json = None
                 index_Json = -1
             send_away["name"] = name_Json
             send_away["emotion"] = emotion_Json
-            send_away["index"] = index_Json
-            #print(json.dumps(send_away))
+            send_away["index"] = int(index_Json)
 
-            print(name_Json, end=" ")
-            print(emotion_Json, end=" ")
-            print("Index ", end="")
-            print(index_Json)
+            print(json.dumps(send_away))
+
+            #print(name_Json, end=" ")
+            #print(emotion_Json, end=" ")
+            #print("Index: ", end="")
+            #print(index_Json)
 
         old_name=wahrscheinlichster_name
         array_names.clear()
