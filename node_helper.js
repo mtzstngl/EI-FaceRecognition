@@ -35,9 +35,11 @@ module.exports = NodeHelper.create({
 		});
 		shell.on("error", function (error) {
 			console.log("ERROR: " + error);
+			self.sendSocketNotification("CRASH", "Die Gesichtserkennung wurde unerwartet beendet! Bitte PC neustarten!");
 		});
 		shell.on("close", function () {
 			console.log("CLOSE");
+			self.sendSocketNotification("CRASH", "Die Gesichtserkennung wurde unerwartet beendet! Bitte PC neustarten!");
 		});
 
 		console.log("EI-FaceRecognition node_helper started");

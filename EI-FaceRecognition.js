@@ -78,6 +78,9 @@ Module.register("EI-FaceRecognition", {
 		case "ERROR":
 			self.sendNotification("SHOW_ALERT", {title: "FEHLER!", message: payload, timer: 10000});
 			break;
+		case "CRASH":
+			self.sendNotification("SHOW_ALERT", {title: "FEHLER!", message: payload});
+			break;
 		}
 	},
 });
