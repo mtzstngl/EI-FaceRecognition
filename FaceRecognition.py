@@ -21,4 +21,4 @@ while True:
     status["name"] = name[random.randint(0, 2)] 
     status["emotion"] = emotion[random.randint(0, 4)]
     print(json.dumps(status))
-    time.sleep(5)
+    time.sleep(10)

@@ -36,6 +36,22 @@ Module.register("EI-FaceRecognition", {
 		self.sendNotification("CHANGE_USER", self.status.index);
 	},
 
+	getGreetingsTextByTime: function(name) {
+		let hours = (new Date()).getHours();
+
+		if (hours > 6  && hours < 12) {
+			return "Guten Morgen " + name + "!";
+		} else if (hours == 12) {
+			return "Guten Mittag " + name + "!";
+		} else if (hours > 12 && hours < 18) {
+			return "Guten Tag " + name + "!";
+		} else if (hours >= 18) {
+			return "Guten Abend " + name + "!";
+		} else {
+			return "Gute Nacht " + name + "!";
+		}
+	},
+
 	// Override dom generator.
 	getDom: function() {
 		const self = this;
@@ -43,8 +59,8 @@ Module.register("EI-FaceRecognition", {
 		var wrapper = document.createElement("div");
 
 		if (self.status.name !== null || self.status.emotion !== null) {
-			let name = self.status.name === null ? "Fremder" : self.status.name;
-			var text = document.createTextNode("Hallo " + name + "!");
+			let name = self.status.name === null ? "Besucher" : self.status.name;
+			var text = document.createTextNode(self.getGreetingsTextByTime(name));
 			wrapper.appendChild(text);
 		}
 
@@ -57,7 +73,7 @@ Module.register("EI-FaceRecognition", {
 		}
 
 		wrapper.className = "light"; // lighter text font
-		wrapper.style = "line-height: 1em"; // condense line spacing
+		wrapper.style = "line-height: 50px; font-size: 45px"; // condense line spacing
 
 		return wrapper;
 	},
