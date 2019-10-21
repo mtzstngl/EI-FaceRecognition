@@ -47,7 +47,7 @@ Module.register("EI-FaceRecognition", {
 			return "Guten Mittag " + name + "!";
 		} else if (hours > 12 && hours < 18) {
 			return "Guten Tag " + name + "!";
-		} else if (hours >= 18) {
+		} else if (hours >= 18 && hours < 22) {
 			return "Guten Abend " + name + "!";
 		} else {
 			return "Gute Nacht " + name + "!";
