@@ -10,7 +10,7 @@ Module.register("EI-FaceRecognition", {
 	defaults: {
 		angry: "Du siehst heute aber wütend aus, nimm es doch nicht so ernst.",
 		happy: "Du siehst heute aber glücklich aus.",
-		neutral: "Ich wünsch dir heute noch einen schönen Tag.",
+		neutral: "Ich wünsch Dir heute noch einen schönen Tag.",
 		sad: "Du siehst heute aber traurig aus. Ich hoffe es wird bald wieder besser.",
 		surprise: "Wieso bist du denn so überrascht?",
 		fear: "Vor was hast du denn Angst?",
@@ -21,6 +21,10 @@ Module.register("EI-FaceRecognition", {
 		emotion: null,
 		index: -1 // -1 == Unkown, Every other is a known person
 	},
+
+	// Prevents showing every module everytime if it is not needed
+	// Also fixes showing modules before MMM-pages has loaded
+	needsShow: false,
 
 	showGreetings: true,
 
@@ -100,6 +104,22 @@ Module.register("EI-FaceRecognition", {
 			if (!self.hidden) {
 				self.sendNotification("CHANGE_USER", self.status.index);
 			}
+
+			// Hide interface if no person is watching
+			if (self.status.name === null && self.status.emotion === null) {
+				self.needsShow = true;
+				// Hide everything
+				MM.getModules().exceptModule(this).enumerate(function(module) {
+					module.hide(0, {lockString: self.identifier});
+				});
+			} else if (self.needsShow === true) {
+				self.needsShow = false;
+				// Show everything
+				MM.getModules().exceptModule(this).enumerate(function(module) {
+					module.show(0, {lockString: self.identifier});
+				});
+			}
+
 			break;
 		case "ERROR":
 			self.sendNotification("SHOW_ALERT", {title: "FEHLER!", message: payload, timer: 10000});
