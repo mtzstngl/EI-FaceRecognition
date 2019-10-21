@@ -22,6 +22,8 @@ Module.register("EI-FaceRecognition", {
 		index: -1 // -1 == Unkown, Every other is a known person
 	},
 
+	showGreetings: true,
+
 	start: function() {
 		const self = this;
 
@@ -58,22 +60,29 @@ Module.register("EI-FaceRecognition", {
 
 		var wrapper = document.createElement("div");
 
-		if (self.status.name !== null || self.status.emotion !== null) {
-			let name = self.status.name === null ? "Besucher" : self.status.name;
-			var text = document.createTextNode(self.getGreetingsTextByTime(name));
-			wrapper.appendChild(text);
+		if (self.showGreetings) {
+			if (self.status.name !== null || self.status.emotion !== null) {
+				let name = self.status.name === null ? "Besucher" : self.status.name;
+				var text = document.createTextNode(self.getGreetingsTextByTime(name));
+				wrapper.appendChild(text);
+			}
+
+			if (self.status.emotion !== null) {
+				var linebreak = document.createElement("br");
+				wrapper.appendChild(linebreak);
+
+				var text = document.createTextNode(self.config[self.status.emotion]);
+				wrapper.appendChild(text);
+			}
+
+			wrapper.className = "light"; // lighter text font
+			wrapper.style = "line-height: 50px; font-size: 45px"; // condense line spacing
+
+			setTimeout(() => {
+				self.showGreetings = false;
+				self.updateDom();
+			}, 5000);
 		}
-
-		if (self.status.emotion !== null) {
-			var linebreak = document.createElement("br");
-			wrapper.appendChild(linebreak);
-
-			var text = document.createTextNode(self.config[self.status.emotion]);
-			wrapper.appendChild(text);
-		}
-
-		wrapper.className = "light"; // lighter text font
-		wrapper.style = "line-height: 50px; font-size: 45px"; // condense line spacing
 
 		return wrapper;
 	},
@@ -86,6 +95,7 @@ Module.register("EI-FaceRecognition", {
 		switch (notification) {
 		case "STATUS": // Got new output from the python module about the current hand position.
 			self.status = payload;
+			self.showGreetings = true;
 			self.updateDom();
 			if (!self.hidden) {
 				self.sendNotification("CHANGE_USER", self.status.index);
