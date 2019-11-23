@@ -105,6 +105,10 @@ Module.register("EI-FaceRecognition", {
 				self.sendNotification("CHANGE_USER", self.status.index);
 			}
 
+			if (self.status.emotion === "sad") {
+				self.sendNotification("MUSIC_DISPLAY", 1);
+			}
+
 			// Hide interface if no person is watching
 			if (self.status.name === null && self.status.emotion === null) {
 				self.needsShow = true;
