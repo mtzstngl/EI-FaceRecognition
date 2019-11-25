@@ -12,6 +12,13 @@ status = {
     "index": -1 # The index of the Person
 }
 
+# Python medicine object
+medicine = {
+    "name": None,
+    "day": None,
+    "amount": 0
+}
+
 name = [None, "Peter", "Max"]
 emotion = [None, "happy", "angry", "sad", "neutral"]
 

@@ -91,6 +91,20 @@ Module.register("EI-FaceRecognition", {
 		return wrapper;
 	},
 
+	// Is called if this module receives a notification from another module
+	notificationReceived: function(notification, payload, sender) {
+		const self = this;
+		
+		switch (notification) {
+		case "MED_START_SCANNING":
+			self.sendSocketNotification("startscanning");
+			break;
+		case "MED_STOP_SCANNING":
+			self.sendSocketNotification("stopscanning");
+			break;
+		}
+	},
+
 	// Is called if we receive a notification from our node_helper.js
 	socketNotificationReceived: function(notification, payload) {
 		const self = this;
@@ -124,6 +138,9 @@ Module.register("EI-FaceRecognition", {
 				});
 			}
 
+			break;
+		case "MEDICINE":
+			self.sendNotification("MEDICINE", payload);
 			break;
 		case "ERROR":
 			self.sendNotification("SHOW_ALERT", {title: "FEHLER!", message: payload, timer: 10000});

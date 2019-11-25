@@ -12,6 +12,9 @@ const {PythonShell} = require("python-shell");
  */
 module.exports = NodeHelper.create({
 
+	shell: null,
+	scanning: false,
+
 	// System is ready to boot
 	start: function() {
 		const self = this;
@@ -25,12 +28,17 @@ module.exports = NodeHelper.create({
 		};
 
 		//const shell = new PythonShell("Gesichtserkennung.py", options); // production version
-		const shell = new PythonShell("FaceRecognition.py", options);
+		self.shell = new PythonShell("FaceRecognition.py", options);
 
 		// Received output from python script; send it to the main module.
 		shell.on("message", function (message) {
 			//console.log("MESSAGE: " + JSON.stringify(message));
-			self.sendSocketNotification("STATUS", message);
+			if (self.scanning) {
+				self.sendSocketNotification("MEDICINE", message);
+			}
+			else {
+				self.sendSocketNotification("STATUS", message);
+			}
 		});
 		shell.on("stderr", function (stderr) {
 			console.log("STDERR: " + stderr);
@@ -56,5 +64,16 @@ module.exports = NodeHelper.create({
 	// My module (EI-FaceRecognition.js) has sent a notification
 	socketNotificationReceived: function(notification, payload) {
 		console.log(this.name + " received a socket notification: " + notification + " - Payload: " + payload);
+
+		switch(notification) {
+			case "startscanning":
+				self.scanning = true;
+				self.shell.send("startscanning");
+				break;
+			case "stopscanning":
+				self.scanning = false;
+				self.shell.send("stopscanning");
+				break;
+		}
 	},
 });
