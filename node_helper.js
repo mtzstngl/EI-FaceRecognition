@@ -63,6 +63,7 @@ module.exports = NodeHelper.create({
 
 	// My module (EI-FaceRecognition.js) has sent a notification
 	socketNotificationReceived: function(notification, payload) {
+		const self = this;
 		console.log(this.name + " received a socket notification: " + notification + " - Payload: " + payload);
 
 		switch(notification) {
