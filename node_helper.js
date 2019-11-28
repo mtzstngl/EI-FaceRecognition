@@ -31,7 +31,7 @@ module.exports = NodeHelper.create({
 		self.shell = new PythonShell("FaceRecognition.py", options);
 
 		// Received output from python script; send it to the main module.
-		shell.on("message", function (message) {
+		self.shell.on("message", function (message) {
 			//console.log("MESSAGE: " + JSON.stringify(message));
 			if (self.scanning) {
 				self.sendSocketNotification("MEDICINE", message);
@@ -40,15 +40,15 @@ module.exports = NodeHelper.create({
 				self.sendSocketNotification("STATUS", message);
 			}
 		});
-		shell.on("stderr", function (stderr) {
+		self.shell.on("stderr", function (stderr) {
 			console.log("STDERR: " + stderr);
 			self.sendSocketNotification("ERROR", stderr);
 		});
-		shell.on("error", function (error) {
+		self.shell.on("error", function (error) {
 			console.log("ERROR: " + error);
 			self.sendSocketNotification("CRASH", "Die Gesichtserkennung wurde unerwartet beendet! Bitte PC neustarten!");
 		});
-		shell.on("close", function () {
+		self.shell.on("close", function () {
 			console.log("CLOSE");
 			self.sendSocketNotification("CRASH", "Die Gesichtserkennung wurde unerwartet beendet! Bitte PC neustarten!");
 		});
