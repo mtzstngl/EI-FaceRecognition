@@ -13,7 +13,6 @@ const {PythonShell} = require("python-shell");
 module.exports = NodeHelper.create({
 
 	shell: null,
-	scanning: false,
 
 	// System is ready to boot
 	start: function() {
@@ -33,7 +32,7 @@ module.exports = NodeHelper.create({
 		// Received output from python script; send it to the main module.
 		self.shell.on("message", function (message) {
 			//console.log("MESSAGE: " + JSON.stringify(message));
-			if (self.scanning) {
+			if ('medicine' in message) {
 				self.sendSocketNotification("MEDICINE", message);
 			}
 			else {
@@ -68,11 +67,7 @@ module.exports = NodeHelper.create({
 
 		switch(notification) {
 			case "startscanning":
-				self.scanning = true;
-				self.shell.send("startscanning");
-				break;
-			case "stopscanning":
-				self.scanning = false;
+				self.shell.send({ command: "startscanning" });
 				break;
 		}
 	},
