@@ -73,7 +73,6 @@ module.exports = NodeHelper.create({
 				break;
 			case "stopscanning":
 				self.scanning = false;
-				self.shell.send("stopscanning");
 				break;
 		}
 	},
