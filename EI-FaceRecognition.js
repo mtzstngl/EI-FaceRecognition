@@ -128,13 +128,13 @@ Module.register("EI-FaceRecognition", {
 				self.needsShow = true;
 				// Hide everything
 				MM.getModules().exceptModule(this).enumerate(function(module) {
-					module.hide(0, {lockString: self.identifier});
+					module.hide(0, {lockString: "FaceRecognition_Lock_String"});
 				});
 			} else if (self.needsShow === true) {
 				self.needsShow = false;
 				// Show everything
 				MM.getModules().exceptModule(this).enumerate(function(module) {
-					module.show(0, {lockString: self.identifier});
+					module.show(0, {lockString: "FaceRecognition_Lock_String"});
 				});
 			}
 
