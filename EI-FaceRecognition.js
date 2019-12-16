@@ -22,6 +22,9 @@ Module.register("EI-FaceRecognition", {
 		index: -1 // -1 == Unkown, Every other is a known person
 	},
 
+	// A reference to the used pages module
+	pagesModule: {},
+
 	// Prevents showing every module everytime if it is not needed
 	// Also fixes showing modules before MMM-pages has loaded
 	needsShow: false,
@@ -96,6 +99,10 @@ Module.register("EI-FaceRecognition", {
 		const self = this;
 		
 		switch (notification) {
+		case "ALL_MODULES_STARTED":
+			// Get the MMM-pages module in order to get information from it
+			self.pagesModule = MM.getModules().withClass("MMM-pages")[0];
+			break;
 		case "MED_START_SCANNING":
 			self.sendSocketNotification("startscanning");
 			break;
@@ -125,11 +132,14 @@ Module.register("EI-FaceRecognition", {
 
 			// Hide interface if no person is watching
 			if (self.status.name === null && self.status.emotion === null) {
-				self.needsShow = true;
-				// Hide everything
-				MM.getModules().exceptModule(this).enumerate(function(module) {
-					module.hide(0, {lockString: "FaceRecognition_Lock_String"});
-				});
+				// Only blank on startpage
+				if (self.pagesModule.curPage === 0) {
+					self.needsShow = true;
+					// Hide everything
+					MM.getModules().exceptModule(this).enumerate(function(module) {
+						module.hide(0, {lockString: "FaceRecognition_Lock_String"});
+					});
+				}
 			} else if (self.needsShow === true) {
 				self.needsShow = false;
 				// Show everything
