@@ -31,6 +31,8 @@ Module.register("EI-FaceRecognition", {
 
 	showGreetings: true,
 
+	blankTimer: null,
+
 	start: function() {
 		const self = this;
 
@@ -132,13 +134,16 @@ Module.register("EI-FaceRecognition", {
 
 			// Hide interface if no person is watching
 			if (self.status.name === null && self.status.emotion === null) {
-				// Only blank on startpage
-				if (self.pagesModule.curPage === 0) {
-					self.needsShow = true;
-					// Hide everything
-					MM.getModules().exceptModule(this).enumerate(function(module) {
-						module.hide(0, {lockString: "FaceRecognition_Lock_String"});
-					});
+				// Only blank on startpage and if timer not already started
+				if (self.blankTimer === null && self.pagesModule.curPage === 0) {
+					self.blankTimer = setTimeout(function(self) {
+						self.needsShow = true; // FIXME(MSt): Cannot set property of undefined
+						self.blankTimer = null;
+						// Hide everything
+						MM.getModules().exceptModule(this).enumerate(function(module) {
+							module.hide(0, {lockString: "FaceRecognition_Lock_String"});
+						});
+					}.bind(this, self), 30*1000); // wait 30s before blanking the screen
 				}
 			} else if (self.needsShow === true) {
 				self.needsShow = false;
@@ -146,6 +151,10 @@ Module.register("EI-FaceRecognition", {
 				MM.getModules().exceptModule(this).enumerate(function(module) {
 					module.show(0, {lockString: "FaceRecognition_Lock_String"});
 				});
+			} else if (self.blankTimer !== null) {
+				// clear blankTimer if suddenly we have a new visitor/face
+				clearTimeout(self.blankTimer);
+				self.blankTimer = null;
 			}
 
 			break;
